@@ -4,9 +4,6 @@
 
 CrisisLink AI takes a raw citizen emergency report and turns it into a verified, prioritized, resourced, security-checked rescue plan — using a Google ADK 2.x graph-based **Workflow**, an **MCP server** for tools, and a **human-in-the-loop** gate for critical decisions.
 
-> This scaffold was built and verified against `google-adk==2.3.0` and the official `mcp` Python SDK. The full workflow graph, all 10 nodes, the MCP server, and the FastAPI app were constructed and smoke-tested in this environment — see [Verification](#verification-already-done) below. **Still run the steps yourself** before you submit; ADK evolves fast and your installed version may differ.
-
-
  ## Demo
 
 ### ADK Workflow Execution
