@@ -14,12 +14,6 @@ CrisisLink AI takes a raw citizen emergency report and turns it into a verified,
   <img src="assets/adk_demo.png" width="1000"/>
 </p>
 
-### Multi-Agent Architecture
-
-<p align="center">
-  <img src="assets/architecture_diagram.svg" width="1000"/>
-</p>
-
 ---
 
 ## Architecture
@@ -51,7 +45,9 @@ Resource Shelter Medical            (parallel)
    Final Response
 ```
 
-See `assets/architecture_diagram.svg` for the rendered version.
+<p align="center">
+  <img src="assets/architecture_diagram.svg" width="1000"/>
+</p>
 
 ---
 
