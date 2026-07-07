@@ -1,0 +1,3 @@
+{"timestamp": "2026-07-07T04:42:31.145054+00:00", "agent": "test_agent", "decision": "unit test", "level": "INFO", "foo": "bar"}
+{"timestamp": "2026-07-07T04:43:05.762922+00:00", "agent": "test_agent", "decision": "unit test", "level": "INFO", "foo": "bar"}
+{"timestamp": "2026-07-07T05:20:16.642270+00:00", "agent": "test_agent", "decision": "unit test", "level": "INFO", "foo": "bar"}
