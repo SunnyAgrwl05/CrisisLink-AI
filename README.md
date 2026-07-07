@@ -4,7 +4,6 @@
 
 CrisisLink AI takes a raw citizen emergency report and turns it into a verified, prioritized, resourced, security-checked rescue plan — using a Google ADK 2.x graph-based **Workflow**, an **MCP server** for tools, and a **human-in-the-loop** gate for critical decisions.
 
-
 ---
 
 ## Demo
@@ -15,13 +14,11 @@ CrisisLink AI takes a raw citizen emergency report and turns it into a verified,
   <img src="assets/adk_demo.png" width="1000"/>
 </p>
 
-
 ### Multi-Agent Architecture
 
 <p align="center">
   <img src="assets/architecture_diagram.svg" width="1000"/>
 </p>
-
 
 ---
 
@@ -56,7 +53,6 @@ Resource Shelter Medical            (parallel)
 
 See `assets/architecture_diagram.svg` for the rendered version.
 
-
 ---
 
 ## Folder Structure
@@ -83,7 +79,6 @@ crisislink-ai/
 └── Dockerfile
 ```
 
-
 ---
 
 ## ADK Requirements Checklist
@@ -103,7 +98,6 @@ crisislink-ai/
 | Docker | `Dockerfile` |
 | ctx.state | agents read `{orchestrator_output}`, `{sos_result}`, etc. via ADK session state |
 
-
 ---
 
 ## Setup
@@ -120,7 +114,6 @@ uv sync
 
 No `GOOGLE_MAPS_API_KEY` or `WEATHER_API_KEY`? That's fine — `weather_tool` calls the free, keyless Open-Meteo API, and the remaining tools fall back to a seeded mock database so everything works offline for judging.
 
-
 ---
 
 ## Run It
@@ -133,7 +126,6 @@ make mcp
 make test
 ```
 
-
 Try the demo scenario:
 
 ```bash
@@ -142,6 +134,43 @@ curl -X POST http://localhost:8080/sos \
   -d '{"report_text":"There is severe flooding in Patna. 15 people trapped near Gandhi Setu."}'
 ```
 
+---
+
+## Demo Prompt
+
+After launching the **Google ADK Playground** or **ADK Web UI**, paste the following emergency report to experience the complete end-to-end multi-agent disaster response workflow.
+
+### Sample Emergency Report
+
+```text
+A 6.9 magnitude earthquake has struck Kathmandu. A residential apartment has partially collapsed, trapping nearly 30 people inside. Several victims are seriously injured, nearby roads are damaged, and communication networks are unstable. Rescue teams, ambulances, medical supplies, and temporary shelters are urgently required.
+```
+
+### Expected Multi-Agent Workflow
+
+1. 🛰️ **Emergency Orchestrator** receives and structures the emergency report.
+2. ✅ **SOS Verification Agent** validates the authenticity of the emergency.
+3. 🌊 **Damage Assessment Agent** estimates disaster severity and impact.
+4. 🚨 **Priority Agent** classifies the incident as **CRITICAL** and calculates the rescue priority.
+5. 🚑 **Resource Allocation Agent** recommends rescue teams, ambulances, food, water, boats, and medical supplies.
+6. 🏠 **Shelter Recommendation Agent** identifies the most suitable nearby shelters.
+7. 🏥 **Medical Assistance Agent** recommends nearby hospitals, emergency contacts, and first-aid guidance.
+8. 🔒 **Security Checkpoint** performs PII masking, prompt-injection detection, and audit logging.
+9. 👤 **Human Approval Agent** requests dispatcher approval before deploying critical rescue resources.
+10. 📢 **Communication Agent** generates the final emergency response for citizens, emergency responders, and authorities.
+
+### Expected Outcome
+
+- ✅ Disaster Severity: **Critical**
+- ✅ Rescue Priority: **CRITICAL**
+- ✅ Recommended Shelter(s)
+- ✅ Nearby Hospital(s)
+- ✅ Allocated Rescue Resources
+- ✅ Estimated Response Time (ETA)
+- ✅ Citizen Safety Instructions
+- ✅ Authority & Emergency Response Summary
+
+The execution should closely match the workflow visualization and ADK execution trace shown in the **Demo** section above.
 
 ---
 
@@ -155,7 +184,6 @@ Before handing this scaffold over, the following was actually run and confirmed:
 4. MCP server verified.
 5. `pytest tests/` → **13/13 passing**.
 
-
 Run locally:
 
 ```bash
@@ -165,7 +193,6 @@ make playground
 
 Then check `audit_log.jsonl`.
 
-
 ---
 
 ## Known Gaps / Next Steps
@@ -173,9 +200,6 @@ Then check `audit_log.jsonl`.
 - `damage_agent` currently supports only text.
 - Shelter and hospital data use a seeded mock database.
 - `human_approval_agent` requires an ADK-compatible UI (`adk web` / `adk run`) for interactive approval.
-
-
-
 
 ## Contributing
 
@@ -185,8 +209,4 @@ Contributions are welcome! Check the [Issues](../../issues) tab for `good first 
 
 ## Author
 
-Sunny Kumar — Co-Organizer & Tech Lead, GDG On Campus BCE Patna · Beta MLSA · GFG Campus Mantri
-
-
-
-
+Sunny Kumar — Co-Organizer & Tech Lead, GDG On Campus BCE Patna · Beta MLSA · GSA Google
