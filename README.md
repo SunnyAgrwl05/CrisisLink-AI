@@ -8,8 +8,6 @@ CrisisLink AI takes a raw citizen emergency report and turns it into a verified,
 
 
 
-## Demo
-
 ### ADK Workflow Execution
 
 ![ADK Workflow](assets/adk_demo.png)
