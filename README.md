@@ -147,3 +147,23 @@ Then check `audit_log.jsonl` in the project root to see the structured decision 
 - `damage_agent` is text-only for now; image-based damage assessment (photo uploads) is a documented future extension.
 - Shelter/hospital data is a small seeded mock DB — swap for a real Sheet/DB before production use.
 - `human_approval_agent`'s `request_input` tool call needs a client that renders ADK long-running-tool prompts (`adk web`, `adk run`, or your own UI) to actually pause and collect a dispatcher's answer.
+
+
+
+
+
+
+
+## Contributing
+
+Contributions are welcome! Check the [Issues](../../issues) tab for `good first issue` labeled tasks. Fork the repo, create a branch, and submit a PR — see individual issues for setup details.
+
+<br>
+
+## Author
+
+Sunny Kumar — Co-Organizer & Tech Lead, GDG On Campus BCE Patna · Beta MLSA · GFG Campus Mantri
+
+
+
+
