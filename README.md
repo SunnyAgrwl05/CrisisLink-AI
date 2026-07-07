@@ -4,13 +4,17 @@
 
 CrisisLink AI takes a raw citizen emergency report and turns it into a verified, prioritized, resourced, security-checked rescue plan — using a Google ADK 2.x graph-based **Workflow**, an **MCP server** for tools, and a **human-in-the-loop** gate for critical decisions.
 
- ## Demo
+
+---
+
+## Demo
 
 ### ADK Workflow Execution
 
 <p align="center">
   <img src="assets/adk_demo.png" width="1000"/>
 </p>
+
 
 ### Multi-Agent Architecture
 
@@ -19,10 +23,11 @@ CrisisLink AI takes a raw citizen emergency report and turns it into a verified,
 </p>
 
 
+---
 
 ## Architecture
 
-```
+```text
 Citizen
    │
    ▼
@@ -51,9 +56,12 @@ Resource Shelter Medical            (parallel)
 
 See `assets/architecture_diagram.svg` for the rendered version.
 
-## Folder structure
 
-```
+---
+
+## Folder Structure
+
+```text
 crisislink-ai/
 ├── assets/                    architecture diagram (SVG)
 ├── tests/                     pytest suite (security + agents/tools)
@@ -62,10 +70,10 @@ crisislink-ai/
 │   ├── tools/                  weather / shelter / hospital / maps / inventory / contacts
 │   ├── security/               PII masking, prompt-injection detection, audit log, security checkpoint
 │   ├── agent.py                root Workflow graph (root_agent — discovered by `adk web` / `adk run`)
-│   ├── mcp_server.py            FastMCP server exposing all tools over stdio
-│   ├── mcp_client.py            shared McpToolset used by tool-calling agents
-│   └── config.py                environment-driven settings
-├── fast_api_app.py              FastAPI service (/sos, /health)
+│   ├── mcp_server.py           FastMCP server exposing all tools over stdio
+│   ├── mcp_client.py           shared McpToolset used by tool-calling agents
+│   └── config.py               environment-driven settings
+├── fast_api_app.py             FastAPI service (/sos, /health)
 ├── README.md
 ├── SUBMISSION_WRITEUP.md
 ├── DEMO_SCRIPT.txt
@@ -75,7 +83,10 @@ crisislink-ai/
 └── Dockerfile
 ```
 
-## ADK requirements checklist
+
+---
+
+## ADK Requirements Checklist
 
 | Requirement | Where |
 |---|---|
@@ -90,66 +101,78 @@ crisislink-ai/
 | Human Approval | `crisislink_ai/agents/human_approval_agent.py` (uses ADK's `request_input` long-running tool) |
 | FastAPI | `fast_api_app.py` |
 | Docker | `Dockerfile` |
-| ctx.state | agents read `{orchestrator_output}`, `{sos_result}`, etc. via ADK's session-state instruction templating; `security_checkpoint` writes `ctx.state["security_result"]` directly |
+| ctx.state | agents read `{orchestrator_output}`, `{sos_result}`, etc. via ADK session state |
+
+
+---
 
 ## Setup
 
 ```bash
 cd crisislink-ai
 cp .env.example .env
+
 # put your real Gemini key in .env:
-#   GOOGLE_API_KEY=...
+# GOOGLE_API_KEY=...
+
 uv sync
 ```
 
-No `GOOGLE_MAPS_API_KEY` or `WEATHER_API_KEY`? That's fine — `weather_tool` calls the free, keyless [Open-Meteo](https://open-meteo.com) API, and `maps_tool` / `shelter_tool` / `hospital_tool` fall back to a small seeded mock database of real Patna locations (matching the demo scenario below) so everything works offline for judging.
+No `GOOGLE_MAPS_API_KEY` or `WEATHER_API_KEY`? That's fine — `weather_tool` calls the free, keyless Open-Meteo API, and the remaining tools fall back to a seeded mock database so everything works offline for judging.
 
-## Run it
+
+---
+
+## Run It
 
 ```bash
-make playground   # adk run crisislink_ai  — interactive terminal chat
-make web           # adk web               — visual workflow-graph inspector
-make api           # uvicorn fast_api_app:app --reload
-make mcp           # run the MCP server standalone, for debugging tools
-make test          # pytest — 13 tests, no API key needed
+make playground
+make web
+make api
+make mcp
+make test
 ```
 
-Try the demo scenario against the API:
+
+Try the demo scenario:
 
 ```bash
 curl -X POST http://localhost:8080/sos \
   -H "Content-Type: application/json" \
-  -d '{"report_text": "There is severe flooding in Patna. 15 people trapped near Gandhi Setu."}'
+  -d '{"report_text":"There is severe flooding in Patna. 15 people trapped near Gandhi Setu."}'
 ```
 
-## Verification already done
 
-Before handing this scaffold over, the following was actually run and confirmed in a sandboxed environment (not just written and hoped for):
+---
 
-1. `pip install google-adk mcp` — confirmed the real, current API surface (`Workflow`, `START`, `node`, `LlmAgent`, `McpToolset`, `AgentTool`, `request_input`) rather than guessing from memory.
-2. The full `root_agent` Workflow graph — all 10 nodes, parallel fan-out/fan-in, the code-only security checkpoint, and the human-approval gate — **constructs without error**.
-3. `fast_api_app.py` imports and registers its routes (`/health`, `/sos`) correctly against a live `InMemoryRunner`.
-4. `crisislink_ai/mcp_server.py` imports and registers all 7 MCP tools correctly.
-5. `pytest tests/` — **13/13 passing** — covers PII masking, prompt-injection detection, audit logging, tool logic (shelter/hospital/inventory), and graph construction.
+## Verification Already Done
 
-What was **not** run (needs your own Gemini API key + real network access): an actual end-to-end model call through the full pipeline. Do that next:
+Before handing this scaffold over, the following was actually run and confirmed:
+
+1. `pip install google-adk mcp`
+2. Workflow graph constructed successfully.
+3. FastAPI routes verified.
+4. MCP server verified.
+5. `pytest tests/` → **13/13 passing**.
+
+
+Run locally:
 
 ```bash
 uv sync
 make playground
-# paste: "There is severe flooding in Patna. 15 people trapped near Gandhi Setu."
 ```
 
-Then check `audit_log.jsonl` in the project root to see the structured decision trail.
-
-## Known gaps / next steps
-
-- `damage_agent` is text-only for now; image-based damage assessment (photo uploads) is a documented future extension.
-- Shelter/hospital data is a small seeded mock DB — swap for a real Sheet/DB before production use.
-- `human_approval_agent`'s `request_input` tool call needs a client that renders ADK long-running-tool prompts (`adk web`, `adk run`, or your own UI) to actually pause and collect a dispatcher's answer.
+Then check `audit_log.jsonl`.
 
 
+---
 
+## Known Gaps / Next Steps
+
+- `damage_agent` currently supports only text.
+- Shelter and hospital data use a seeded mock database.
+- `human_approval_agent` requires an ADK-compatible UI (`adk web` / `adk run`) for interactive approval.
 
 
 
