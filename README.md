@@ -7,16 +7,19 @@ CrisisLink AI takes a raw citizen emergency report and turns it into a verified,
 > This scaffold was built and verified against `google-adk==2.3.0` and the official `mcp` Python SDK. The full workflow graph, all 10 nodes, the MCP server, and the FastAPI app were constructed and smoke-tested in this environment — see [Verification](#verification-already-done) below. **Still run the steps yourself** before you submit; ADK evolves fast and your installed version may differ.
 
 
+ ## Demo
 
 ### ADK Workflow Execution
 
-![ADK Workflow](assets/adk_demo.png)
+<p align="center">
+  <img src="assets/adk_demo.png" width="1000"/>
+</p>
 
 ### Multi-Agent Architecture
 
-![Architecture](assets/architecture_diagram.png)
-
-
+<p align="center">
+  <img src="assets/architecture_diagram.svg" width="1000"/>
+</p>
 
 
 
