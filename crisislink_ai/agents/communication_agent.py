@@ -37,8 +37,8 @@ communication_agent = LlmAgent(
         "3. ngo_report: one-paragraph summary for partner NGOs (needs + location).\n"
         "4. sms_summary: under 160 characters.\n\n"
         "Respond ONLY with a compact JSON object in this exact shape:\n"
-        '{\"citizen_message\": \"...\", \"authority_summary\": \"...\", '
-        '\"ngo_report\": \"...\", \"sms_summary\": \"...\"}'
+        '{"citizen_message":"...","authority_summary":"...","ngo_report":"...","sms_summary":"..."}'
     ),
     output_key="final_response",
 )
+
