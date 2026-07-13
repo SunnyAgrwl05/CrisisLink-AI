@@ -1,0 +1,11 @@
+crisislink_ai/agents/damage_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/medical_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/priority_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/human_approval_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/resource_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/shelter_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/orchestrator.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/orchestrator.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/communication_agent.py:    model=settings.MODEL_NAME,
+crisislink_ai/agents/sos_agent.py:    model=get_rotating_model(),
+crisislink_ai/key_rotation.py:    return RotatingGemini(model=settings.MODEL_NAME)

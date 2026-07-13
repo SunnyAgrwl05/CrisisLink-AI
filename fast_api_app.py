@@ -13,6 +13,7 @@ import uuid
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from google.genai import types
 from pydantic import BaseModel
 
@@ -26,6 +27,22 @@ app = FastAPI(
     title="CrisisLink AI",
     description="AI-Powered Multi-Agent Disaster Coordination System",
     version="0.1.0",
+)
+
+# Allow React/Vite frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 _runner = InMemoryRunner(
@@ -151,3 +168,4 @@ async def submit_sos(payload: SOSRequest):
         ),
         raw_state=final_state,
     )
+

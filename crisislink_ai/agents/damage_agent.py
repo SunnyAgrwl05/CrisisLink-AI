@@ -11,11 +11,12 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 
 from ..config import settings
+from ..key_rotation import get_rotating_model
 from ..mcp_client import mcp_toolset
 
 damage_agent = LlmAgent(
     name="damage_agent",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="single_turn",
     description="Assesses disaster severity and estimated impact from a citizen report.",
     tools=[mcp_toolset],

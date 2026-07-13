@@ -9,11 +9,12 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 
 from ..config import settings
+from ..key_rotation import get_rotating_model
 from ..mcp_client import mcp_toolset
 
 shelter_agent = LlmAgent(
     name="shelter_agent",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="single_turn",
     description="Recommends the best nearby shelters for the affected people.",
     tools=[mcp_toolset],

@@ -16,10 +16,11 @@ from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
 
 from ..config import settings
+from ..key_rotation import get_rotating_model
 
 _triage_advisor = LlmAgent(
     name="triage_advisor",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="chat",
     description="Gives a fast one-line urgency opinion on a raw citizen report.",
     instruction=(
@@ -30,7 +31,7 @@ _triage_advisor = LlmAgent(
 
 orchestrator_agent = LlmAgent(
     name="orchestrator",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="single_turn",
     description="Main controller: receives the citizen report and extracts structured fields for downstream agents.",
     tools=[AgentTool(_triage_advisor)],

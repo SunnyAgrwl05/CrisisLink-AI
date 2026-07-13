@@ -1,4 +1,4 @@
-"""Rotates across multiple Gemini API keys, auto-retrying on 429 quota errors."""
+"""Round-robin Gemini API key rotation."""
 
 from __future__ import annotations
 
@@ -9,39 +9,61 @@ from google.adk.models.google_llm import Gemini
 
 from .config import settings
 
-_KEYS = [k for k in (settings.GOOGLE_API_KEY, settings.GOOGLE_API_KEY_2, settings.GOOGLE_API_KEY_3) if k]
+_KEYS = [
+    k
+    for k in (
+        settings.GOOGLE_API_KEY,
+        settings.GOOGLE_API_KEY_2,
+        settings.GOOGLE_API_KEY_3,
+    )
+    if k
+]
+
 if not _KEYS:
-    raise RuntimeError("No GOOGLE_API_KEY / GOOGLE_API_KEY_2 / GOOGLE_API_KEY_3 found in .env")
+    raise RuntimeError("No Gemini API keys found.")
 
 _key_cycle = itertools.cycle(_KEYS)
 
 
 class RotatingGemini(Gemini):
-    """Gemini model wrapper: on RESOURCE_EXHAUSTED (429), rotates to the next key and retries."""
+    """Rotate API key before EVERY request."""
 
-    def _rotate_key(self) -> None:
-        new_key = next(_key_cycle)
-        os.environ["GOOGLE_API_KEY"] = new_key
-        self.__dict__.pop("api_client", None)  # force client rebuild with new key
+    def _next_key(self):
+        key = next(_key_cycle)
+        os.environ["GOOGLE_API_KEY"] = key
 
-    async def generate_content_async(self, llm_request, stream: bool = False):
-        last_err = None
+        # Force ADK to recreate the client
+        self.__dict__.pop("api_client", None)
+
+    async def generate_content_async(self, llm_request, stream=False):
+        last_error = None
+
         for _ in range(len(_KEYS)):
+            self._next_key()
+
             try:
-                async for response in super().generate_content_async(llm_request, stream=stream):
-                    yield response
+                async for chunk in super().generate_content_async(
+                    llm_request,
+                    stream=stream,
+                ):
+                    yield chunk
                 return
-            except Exception as e:  # noqa: BLE001
+
+            except Exception as e:
+                last_error = e
                 msg = str(e)
-                if "RESOURCE_EXHAUSTED" in msg or "429" in msg:
-                    last_err = e
-                    self._rotate_key()
+
+                if (
+                    "429" in msg
+                    or "RESOURCE_EXHAUSTED" in msg
+                ):
                     continue
+
                 raise
-        if last_err:
-            raise last_err
+
+        raise last_error
 
 
-def get_rotating_model() -> RotatingGemini:
+def get_rotating_model():
     return RotatingGemini(model=settings.MODEL_NAME)
 

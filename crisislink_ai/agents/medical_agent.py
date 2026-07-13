@@ -11,11 +11,12 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 
 from ..config import settings
+from ..key_rotation import get_rotating_model
 from ..mcp_client import mcp_toolset
 
 medical_agent = LlmAgent(
     name="medical_agent",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="single_turn",
     description="Suggests first aid guidance, nearby hospitals, and emergency contacts.",
     tools=[mcp_toolset],

@@ -10,11 +10,12 @@ from __future__ import annotations
 from google.adk.agents import LlmAgent
 
 from ..config import settings
+from ..key_rotation import get_rotating_model
 from ..mcp_client import mcp_toolset
 
 priority_agent = LlmAgent(
     name="priority_agent",
-    model=settings.MODEL_NAME,
+    model=get_rotating_model(),
     mode="single_turn",
     description="Calculates a 0-100 rescue priority score.",
     tools=[mcp_toolset],
