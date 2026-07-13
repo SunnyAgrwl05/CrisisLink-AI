@@ -3,14 +3,12 @@
 Exposes the multi-agent Workflow over HTTP so a citizen-facing app,
 NGO dashboard, or government portal can submit a report and receive
 the final response plan.
-
-Run locally:
-    uv run uvicorn fast_api_app:app --host 0.0.0.0 --port 8080 --reload
 """
 
 from __future__ import annotations
 
 import json
+import traceback
 import uuid
 from typing import Any
 
@@ -18,7 +16,7 @@ from fastapi import FastAPI, HTTPException
 from google.genai import types
 from pydantic import BaseModel
 
-import google.adk  # noqa: F401  (ensures submodules register before Runner import)
+import google.adk  # noqa: F401
 from google.adk.runners import InMemoryRunner
 
 from crisislink_ai.agent import root_agent
@@ -30,7 +28,10 @@ app = FastAPI(
     version="0.1.0",
 )
 
-_runner = InMemoryRunner(agent=root_agent, app_name="crisislink-ai")
+_runner = InMemoryRunner(
+    agent=root_agent,
+    app_name="crisislink-ai",
+)
 
 
 class SOSRequest(BaseModel):
@@ -57,15 +58,21 @@ def _try_parse(value: Any) -> Any:
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "model": settings.MODEL_NAME}
+async def health():
+    return {
+        "status": "ok",
+        "model": settings.MODEL_NAME,
+    }
 
 
 @app.post("/sos", response_model=SOSResponse)
-async def submit_sos(payload: SOSRequest) -> SOSResponse:
-    """Submits a citizen SOS/emergency report and runs the full pipeline."""
+async def submit_sos(payload: SOSRequest):
+
     if not payload.report_text.strip():
-        raise HTTPException(status_code=400, detail="report_text must not be empty")
+        raise HTTPException(
+            status_code=400,
+            detail="report_text must not be empty",
+        )
 
     user_id = payload.user_id or "citizen"
     session_id = str(uuid.uuid4())
@@ -78,23 +85,69 @@ async def submit_sos(payload: SOSRequest) -> SOSResponse:
 
     new_message = types.Content(
         role="user",
-        parts=[types.Part(text=payload.report_text)],
+        parts=[
+            types.Part(text=payload.report_text),
+        ],
     )
 
     final_state: dict[str, Any] = {}
-    async for event in _runner.run_async(
-        user_id=user_id,
-        session_id=session_id,
-        new_message=new_message,
-    ):
-        if event.actions and event.actions.state_delta:
-            final_state.update(event.actions.state_delta)
+
+    try:
+
+        async for event in _runner.run_async(
+            user_id=user_id,
+            session_id=session_id,
+            new_message=new_message,
+        ):
+
+            print("\n" + "=" * 80)
+            print("EVENT")
+            print(event)
+            print("=" * 80)
+
+            if event.actions:
+                print("ACTIONS:")
+                print(event.actions)
+
+            if event.actions and event.actions.state_delta:
+                print("STATE DELTA:")
+                print(event.actions.state_delta)
+
+                final_state.update(event.actions.state_delta)
+
+        print("\n" + "=" * 80)
+        print("FINAL STATE")
+        print(json.dumps(final_state, indent=2, default=str))
+        print("=" * 80)
+
+    except Exception as e:
+
+        print("\n" + "=" * 80)
+        print("ADK ERROR")
+        traceback.print_exc()
+        print("=" * 80)
+
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "type": type(e).__name__,
+            },
+        )
 
     return SOSResponse(
         session_id=session_id,
-        final_response=_try_parse(final_state.get("final_response")),
-        priority_result=_try_parse(final_state.get("priority_result")),
-        security_result=_try_parse(final_state.get("security_result")),
-        approval_result=_try_parse(final_state.get("approval_result")),
+        final_response=_try_parse(
+            final_state.get("final_response")
+        ),
+        priority_result=_try_parse(
+            final_state.get("priority_result")
+        ),
+        security_result=_try_parse(
+            final_state.get("security_result")
+        ),
+        approval_result=_try_parse(
+            final_state.get("approval_result")
+        ),
         raw_state=final_state,
     )
