@@ -3,6 +3,7 @@
 // variable in Vercel for production. Falls back to localhost for dev.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
+console.log("API URL =", API_URL);
 export async function checkBackendHealth() {
   try {
     const res = await fetch(`${API_URL}/health`, { method: 'GET' })
