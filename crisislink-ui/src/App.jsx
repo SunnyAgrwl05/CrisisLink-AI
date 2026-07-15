@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import Navbar from './components/Navbar.jsx'
-import WorkflowGraph from './components/WorkflowGraph.jsx'
-import EmergencyConsole from './components/EmergencyConsole.jsx'
-import LiveExecution from './components/LiveExecution.jsx'
-import ResultPanel from './components/ResultPanel.jsx'
 import StatusBar from './components/StatusBar.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import LiveMap from './pages/LiveMap.jsx'
+import Incidents from './pages/Incidents.jsx'
+import AIAgents from './pages/AIAgents.jsx'
+import Resources from './pages/Resources.jsx'
+import Hospitals from './pages/Hospitals.jsx'
+import Shelters from './pages/Shelters.jsx'
+import Reports from './pages/Reports.jsx'
 import { checkBackendHealth, submitEmergency } from './api.js'
 
 const ORDER = [
@@ -37,24 +41,15 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-
     const handleResize = () => {
-
       if (!isMobile()) {
-
         setCollapsed(false);
         setMobileOpen(false);
-
       }
-
     };
-
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
-
   }, []);
-
 
   async function handleAnalyze(text) {
     setRunning(true)
@@ -64,7 +59,6 @@ export default function App() {
     setElapsed({})
     startRef.current = Date.now()
 
-    // Step the visual timeline forward while the real request is in flight.
     timerRef.current = setInterval(() => {
       setActiveIndex(prev => {
         const next = Math.min(prev + 1, ORDER.length - 1)
@@ -87,6 +81,31 @@ export default function App() {
     }
   }
 
+  function renderCurrentPage() {
+    switch (currentPage) {
+      case 'map':       return <LiveMap />
+      case 'incidents': return <Incidents />
+      case 'agents':    return <AIAgents />
+      case 'resources': return <Resources />
+      case 'hospitals': return <Hospitals />
+      case 'shelters':  return <Shelters />
+      case 'reports':   return <Reports />
+      default:          return (
+        <Dashboard
+          ORDER={ORDER}
+          running={running}
+          activeIndex={activeIndex}
+          elapsed={elapsed}
+          result={result}
+          error={error}
+          userId={userId}
+          setUserId={setUserId}
+          onAnalyze={handleAnalyze}
+        />
+      )
+    }
+  }
+
   return (
     <div className="app">
       <>
@@ -99,24 +118,15 @@ export default function App() {
 
         <Sidebar
           collapsed={isMobile() ? !mobileOpen : collapsed}
-
           onToggle={() => {
-
             if (isMobile()) {
-
               setMobileOpen(prev => !prev);
-
             } else {
-
               setCollapsed(prev => !prev);
-
             }
-
           }}
-
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
-
         />
       </>
       <div className="app__main">
@@ -124,51 +134,14 @@ export default function App() {
           backendOnline={backendOnline}
           userId={userId}
           onMenuClick={() => {
-
             if (isMobile()) {
               setMobileOpen(!mobileOpen);
             } else {
               setCollapsed(!collapsed);
             }
-
           }}
         />
-        <div className="hero">
-          <h1 className="hero__title">
-            Every second counts. <span className="hero__accent">Let AI coordinate the response.</span>
-          </h1>
-          <p className="hero__subtitle">
-            Describe an emergency below and watch ten specialized agents verify, prioritize, and route help — live.
-          </p>
-        </div>
-
-        <div className="dashboard">
-          <div className="dashboard__col dashboard__col--graph">
-            <div className="panel panel--bright">
-              <div className="panel__head">
-                <h2 className="panel__title">AI agent workflow</h2>
-                <span className="panel__live"><span className="pill__dot" /> Live</span>
-              </div>
-              <WorkflowGraph order={ORDER} activeIndex={activeIndex} running={running} />
-            </div>
-          </div>
-
-          <div className="dashboard__col dashboard__col--side">
-            <div className="panel panel--bright panel--glow">
-              <h2 className="panel__title">Emergency console</h2>
-              <EmergencyConsole onAnalyze={handleAnalyze} running={running} userId={userId} setUserId={setUserId} />
-            </div>
-
-            <div className="panel">
-              <LiveExecution order={ORDER} activeIndex={activeIndex} elapsed={elapsed} />
-            </div>
-
-            <div className="panel">
-              <ResultPanel result={result} error={error} />
-            </div>
-          </div>
-        </div>
-
+        {renderCurrentPage()}
         <StatusBar backendOnline={backendOnline} activeIncidents={incidentCount} />
       </div>
     </div>

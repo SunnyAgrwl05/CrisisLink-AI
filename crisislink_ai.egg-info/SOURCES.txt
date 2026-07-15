@@ -3,6 +3,7 @@ pyproject.toml
 crisislink_ai/__init__.py
 crisislink_ai/agent.py
 crisislink_ai/config.py
+crisislink_ai/key_rotation.py
 crisislink_ai/mcp_client.py
 crisislink_ai/mcp_server.py
 crisislink_ai.egg-info/PKG-INFO
