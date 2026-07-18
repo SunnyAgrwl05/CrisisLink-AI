@@ -1,0 +1,26 @@
+name: Documentation Improvement
+description: Report unclear, missing, or incorrect documentation
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Which file or section needs improvement? (e.g. README.md, CONTRIBUTING.md)
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's Wrong or Missing
+      description: Describe what's unclear, incorrect, or missing.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
+      description: How would you improve it?
+    validations:
+      required: false
